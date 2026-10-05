@@ -8,3 +8,15 @@ def test_window():
 def test_recovery_gate(): assert recovery_allowed("amount_mismatch",10000); assert not recovery_allowed("amount_mismatch",9999)
 def test_negative_rejected():
     with pytest.raises(ValueError): normalize({"source":"a","reference":"x","amount_paise":-1,"timestamp":1})
+
+
+def test_duplicate_references_do_not_consume_each_other():
+    left = [
+        normalize({"source": "a", "reference": "", "amount_paise": 100, "timestamp": 1}),
+        normalize({"source": "a", "reference": "", "amount_paise": 100, "timestamp": 2}),
+    ]
+    right = [
+        normalize({"source": "b", "reference": "", "amount_paise": 100, "timestamp": 1}),
+        normalize({"source": "b", "reference": "", "amount_paise": 100, "timestamp": 2}),
+    ]
+    assert len(match(left, right)) == 2
